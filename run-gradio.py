@@ -3,17 +3,23 @@ from gpt import get_model
 
 
 model_small, tokenizer_small = get_model("gpt2")
-model_xl, tokenizer_xl = get_model("gpt2-xl")
+model_large, tokenizer_large = get_model("gpt2-large")
 
 def predict(inp, model_type):
-    if model_type == "gpt2-xl":
-        model, tokenizer = model_xl, tokenizer_xl
+    if model_type == "gpt2-large":
+        model, tokenizer = model_large, tokenizer_large
+        input_ids = tokenizer.encode(inp, return_tensors='tf')
+        beam_output = model.generate(input_ids, max_length=50, num_beams=5,
+                                     no_repeat_ngram_size=2,
+                                     early_stopping=True)
+        output = tokenizer.decode(beam_output[0], skip_special_tokens=True,
+                                  clean_up_tokenization_spaces=True)
     else:
         model, tokenizer = model_small, tokenizer_small
-    input_ids = tokenizer.encode(inp, return_tensors='tf')
-    beam_output = model.generate(input_ids, max_length=40, num_beams=5,
+        input_ids = tokenizer.encode(inp, return_tensors='tf')
+        beam_output = model.generate(input_ids, max_length=70, num_beams=5,
                                  no_repeat_ngram_size=2, early_stopping=True)
-    output = tokenizer.decode(beam_output[0], skip_special_tokens=True,
+        output = tokenizer.decode(beam_output[0], skip_special_tokens=True,
                               clean_up_tokenization_spaces=True)
     if output.count(".") >= 2:
         output = ".".join(output.split(".")[:-1]) + "."
@@ -22,13 +28,15 @@ def predict(inp, model_type):
  
 
 INPUTS = [gradio.inputs.Textbox(lines=2, label="Input Text"),
-            gradio.inputs.Radio(choices=["gpt2-xl", "gpt2-small"], label="Choose "
-                                                                "between xl "
-                                                                "and small")]
+            gradio.inputs.Radio(choices=["gpt2-small", "gpt2-large"],
+                                label="Choose "
+                                                                "between "
+                                                                         "small "
+                                                                "and large")]
 OUTPUTS = gradio.outputs.Textbox()
 examples = [
-    ["The toughest thing about software engineering is", "gpt2-xl"],
-    ["The future of AI ", "gpt2-xl"],
+    ["The toughest thing about software engineering is", "gpt2-large"],
+    ["The future of AI ", "gpt2-large"],
     ["Is this the real life? Is this just fantasy?", "gpt2-small"]
 ]
 INTERFACE = gradio.Interface(fn=predict, inputs=INPUTS, outputs=OUTPUTS, title="GPT-2",
@@ -38,8 +46,9 @@ INTERFACE = gradio.Interface(fn=predict, inputs=INPUTS, outputs=OUTPUTS, title="
                              "trained with a simple objective: predict the "
                              "next word, given all of the previous words "
                              "within some text. You can configure small vs "
-                             "xl below: the xl model takes longer to run ("
-                             "55s vs 15s) "
+                             "large below: the large model takes longer to "
+                             "run ("
+                             "55s vs 30s) "
                              "but generates better text.",
                  thumbnail="https://github.com/gradio-app/gpt-2/raw/master/screenshots/interface.png?raw=true",
                              examples=examples,
