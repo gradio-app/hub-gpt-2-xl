@@ -9,7 +9,7 @@ def predict(inp, model_type):
     if model_type == "gpt2-large":
         model, tokenizer = model_large, tokenizer_large
         input_ids = tokenizer.encode(inp, return_tensors='tf')
-        beam_output = model.generate(input_ids, max_length=50, num_beams=5,
+        beam_output = model.generate(input_ids, max_length=42, num_beams=5,
                                      no_repeat_ngram_size=2,
                                      early_stopping=True)
         output = tokenizer.decode(beam_output[0], skip_special_tokens=True,
