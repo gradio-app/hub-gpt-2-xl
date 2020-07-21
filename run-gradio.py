@@ -9,7 +9,7 @@ def predict(inp, model_type):
     if model_type == "gpt2-large":
         model, tokenizer = model_large, tokenizer_large
         input_ids = tokenizer.encode(inp, return_tensors='tf')
-        beam_output = model.generate(input_ids, max_length=42, num_beams=5,
+        beam_output = model.generate(input_ids, max_length=45, num_beams=5,
                                      no_repeat_ngram_size=2,
                                      early_stopping=True)
         output = tokenizer.decode(beam_output[0], skip_special_tokens=True,
@@ -17,7 +17,7 @@ def predict(inp, model_type):
     else:
         model, tokenizer = model_small, tokenizer_small
         input_ids = tokenizer.encode(inp, return_tensors='tf')
-        beam_output = model.generate(input_ids, max_length=70, num_beams=5,
+        beam_output = model.generate(input_ids, max_length=60, num_beams=5,
                                  no_repeat_ngram_size=2, early_stopping=True)
         output = tokenizer.decode(beam_output[0], skip_special_tokens=True,
                               clean_up_tokenization_spaces=True)
@@ -36,7 +36,6 @@ INPUTS = [gradio.inputs.Textbox(lines=2, label="Input Text"),
 OUTPUTS = gradio.outputs.Textbox()
 examples = [
     ["The toughest thing about software engineering is", "gpt2-large"],
-    ["The future of AI ", "gpt2-large"],
     ["Is this the real life? Is this just fantasy?", "gpt2-small"]
 ]
 INTERFACE = gradio.Interface(fn=predict, inputs=INPUTS, outputs=OUTPUTS, title="GPT-2",
