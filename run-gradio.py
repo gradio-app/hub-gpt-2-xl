@@ -29,10 +29,7 @@ def predict(inp, model_type):
 
 INPUTS = [gradio.inputs.Textbox(lines=2, label="Input Text"),
             gradio.inputs.Radio(choices=["gpt2-small", "gpt2-large"],
-                                label="Choose "
-                                                                "between "
-                                                                         "small "
-                                                                "and large")]
+                                label="Model Size")]
 OUTPUTS = gradio.outputs.Textbox()
 examples = [
     ["The toughest thing about software engineering is", "gpt2-large"],
